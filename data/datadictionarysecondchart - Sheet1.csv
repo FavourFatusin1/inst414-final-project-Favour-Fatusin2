@@ -1,0 +1,5 @@
+Name,Data Types,Example,Units,Description
+Age,Integer (categorical),30 to 39,Number,Age group of fraud victims
+Most common type of identity theft,Categorical (Text),Credit card fraud,Text,The most common amount of fraud in age group
+"Number of reports, 2024 Q1-Q2",Integer,sixty one thousand seven hundered and seventy three,Integer,Amount of reports of that fraud
+"Percentage of age's total identity theft reports, 2022",Integer(Percent),36%,Pecent,Percent made up of those reports
