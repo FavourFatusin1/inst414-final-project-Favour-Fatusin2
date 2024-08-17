@@ -15,3 +15,4 @@ Setup Instructions
 - you can name it whatever, you would like, install numpy, pandas, and any other library required.
 - run the code in main
 - the tables and charts will come up in data/
+- **If main function doesn't work you can run each file seperately**
