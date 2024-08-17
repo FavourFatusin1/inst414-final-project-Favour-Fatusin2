@@ -1,56 +1,53 @@
 import pandas as pd
-import joblib  # For saving the model
+import joblib
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
 import os
 
-# Ensure the 'models' directory exists
-def create_models_directory():
-    os.makedirs('data/models', exist_ok=True)
+def train_and_save_model():
+    # Define file paths
+    file_path = 'data/processed/loaded_firstchart.csv'
+    model_path = 'data/models/linear_regression_model.pkl'
+    predictions_path = 'data/models/predictions.csv'
 
-# Load the dataset
-def load_data(file_path):
+    # Ensure the 'models' directory exists
+    os.makedirs(os.path.dirname(model_path), exist_ok=True)
+
+    # Load the dataset
     df = pd.read_csv(file_path)
-    return df
 
-# Prepare the data by cleaning and selecting features/target
-def prepare_data(df):
-    # Remove percentage signs and convert to numeric
+    # Prepare the data by cleaning and selecting features/target
     df['percentage_of_age\'s_total_identity_theft_reports,_2022'] = df['percentage_of_age\'s_total_identity_theft_reports,_2022'].str.rstrip('%').astype('float') / 100.0
-
-    # Define features and target
     X = df[['number_of_reports,_2024_q1-q2']]  # Features
     y = df['percentage_of_age\'s_total_identity_theft_reports,_2022']  # Target
-    return X, y
 
-# Split the data into training and testing sets
-def split_data(X, y, test_size=0.2, random_state=42):
-    return train_test_split(X, y, test_size=test_size, random_state=random_state)
+    # Split the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Train the Linear Regression model
-def train_model(X_train, y_train):
+    # Train the Linear Regression model
     model = LinearRegression()
     model.fit(X_train, y_train)
-    return model
 
-# Evaluate the model's performance
-def evaluate_model(model, X_test, y_test):
+    # Evaluate the model's performance
     y_pred = model.predict(X_test)
     mse = mean_squared_error(y_test, y_pred)
     r2 = r2_score(y_test, y_pred)
-    return mse, r2, y_pred
 
-# Save the model to disk
-def save_model(model, model_path):
+    # Print the performance metrics
+    print(f"Mean Squared Error: {mse}")
+    print(f"R^2 Score: {r2}")
+
+    # Save the model to disk
     joblib.dump(model, model_path)
     print(f"Model saved to {model_path}")
 
-# Save predictions to a CSV file
-def save_predictions(y_test, y_pred, predictions_path):
+    # Save predictions to a CSV file
     predictions_df = pd.DataFrame({
         'Actual': y_test,
         'Predicted': y_pred
     })
     predictions_df.to_csv(predictions_path, index=False)
     print(f"Predictions saved to {predictions_path}")
+
+
