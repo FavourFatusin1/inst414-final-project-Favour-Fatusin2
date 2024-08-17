@@ -1,5 +1,5 @@
 import pandas as pd
-import joblib  # For loading the saved model
+import joblib
 from sklearn.metrics import mean_squared_error, r2_score
 import os
 
@@ -15,7 +15,6 @@ print("Columns in df1:")
 print(df1.columns)
 
 # Convert target variable to numeric
-# Remove '%' and convert to float
 df1['Percentage of age\'s total identity theft reports, 2022'] = df1['Percentage of age\'s total identity theft reports, 2022'].str.rstrip('%').astype(float) / 100.0
 
 # Select features and target
@@ -37,7 +36,7 @@ r2 = r2_score(y, y_pred)
 print(f"Mean Squared Error: {mse}")
 print(f"R^2 Score: {r2}")
 
-# Optionally, save predictions
+# Save predictions
 predictions_df = pd.DataFrame({
     'Actual': y,
     'Predicted': y_pred
