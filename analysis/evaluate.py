@@ -1,42 +1,68 @@
+import requests
+from bs4 import BeautifulSoup
 import pandas as pd
-import joblib
-from sklearn.metrics import mean_squared_error, r2_score
 import os
+from io import StringIO
 
-# Ensure the 'models' directory exists
-def create_models_directory():
-    os.makedirs('data/models', exist_ok=True)
+# Directory to save the raw data
+output_dir = 'data'
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
 
-# Load the processed data
-def load_data(file_path):
-    return pd.read_csv(file_path)
+def extract_table(url, file_name, table_index=0):
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+    
+    # Send a GET request to the page with headers
+    response = requests.get(url, headers=headers)
 
-# Prepare the data by converting the target variable to numeric
-def prepare_data(df):
-    df['percentage_of_age\'s_total_identity_theft_reports,_2022'] = df['percentage_of_age\'s_total_identity_theft_reports,_2022'].str.rstrip('%').astype(float) / 100.0
-    X = df[['number_of_reports,_2024_q1-q2']]  # Feature(s)
-    y = df['percentage_of_age\'s_total_identity_theft_reports,_2022']  # Target
-    return X, y
+    # Check if the request was successful
+    if response.status_code == 200:
+        html_content = response.text
+    else:
+        raise Exception(f"Failed to retrieve the page from {url}. Status code: {response.status_code}")
 
-# Load the saved model
-def load_model(model_path):
-    return joblib.load(model_path)
+    # Parse the HTML content
+    soup = BeautifulSoup(html_content, 'html.parser')
 
-# Make predictions using the loaded model
-def make_predictions(model, X):
-    return model.predict(X)
+    # Find all tables
+    tables = soup.find_all('table')
+    print(f"Found {len(tables)} tables on the page {url}")
 
-# Evaluate the model's performance
-def evaluate_model(y, y_pred):
-    mse = mean_squared_error(y, y_pred)
-    r2 = r2_score(y, y_pred)
-    return mse, r2
+    # Ensure we have the right number of tables
+    if len(tables) <= table_index:
+        raise Exception(f"Table index {table_index} is out of range for the page {url}.")
+    
+    # Convert the chosen table to a DataFrame
+    table_html = str(tables[table_index])
+    df = pd.read_html(StringIO(table_html))[0]
 
-# Save predictions to a CSV file
-def save_predictions(y, y_pred, predictions_path):
-    predictions_df = pd.DataFrame({
-        'Actual': y,
-        'Predicted': y_pred
-    })
-    predictions_df.to_csv(predictions_path, index=False)
-    print(f"Evaluated predictions saved to {predictions_path}")
+    # Define the file path
+    file_path = os.path.join(output_dir, file_name)
+
+    # Save the DataFrame to a CSV file
+    df.to_csv(file_path, index=False)
+
+    print(f"Data successfully extracted and saved to {file_path}")
+
+# Define sources with their specific table indices
+sources = [
+    {
+        'url': 'https://www.fool.com/the-ascent/research/identity-theft-credit-card-fraud-statistics/', 
+        'file_name': 'firstchart.csv',
+        'table_index': 7  # 8th table on the page
+    },
+    {
+        'url': 'https://wallethub.com/edu/cc/credit-card-fraud-statistics/25725',
+        'file_name': 'secondchart.csv',
+        'table_index': 0  # 9th table on the page
+    }
+]
+
+# Extract and save tables
+for source in sources:
+    try:
+        extract_table(source['url'], source['file_name'], source['table_index'])
+    except Exception as e:
+        print(f"Error extracting data from {source['url']}: {e}")
