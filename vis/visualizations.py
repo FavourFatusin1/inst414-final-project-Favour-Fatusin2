@@ -82,18 +82,39 @@ def interactive_scatter_plot(df2):
     fig2.write_html('data/visualizations/interactive_scatter_plot.html')
     fig2.show()
 
-# Plotly Choropleth Map for Credit Card Fraud per Capita
-def choropleth_map(df2):
+
+
+def create_choropleth_map(df2):
+    # Define custom bins for categorizing Credit Card Fraud per Capita
+    bins = [0, 0.30, 0.50, 0.70, 1.0, 1.49]
+    labels = ['0.00-0.30', '0.31-0.50', '0.51-0.70', '0.71-1.00', '1.01-1.49']
+
+    # Create a new column for the binned data
+    df2['Fraud Rate Category'] = pd.cut(df2['Credit Card Fraud per Capita'], bins=bins, labels=labels, include_lowest=True)
+
+    # Create a choropleth map
     fig3 = px.choropleth(
         df2,
         locations='State',  # Assuming your DataFrame contains state abbreviations or full names
         locationmode='USA-states',  # Use 'USA-states' for state abbreviations
-        color='Credit Card Fraud per Capita',  # The data to color code by
+        color='Fraud Rate Category',  # The data to color code by
         hover_name='State',  # Column to show when hovering over states
-        color_continuous_scale='Viridis',  # Color scale
+        color_discrete_sequence=px.colors.sequential.Viridis,  # Color scale
         scope='usa',  # Focus on the USA map
-        labels={'Credit Card Fraud per Capita': 'Credit Card Fraud per Capita'}
+        labels={'Fraud Rate Category': 'Fraud Rate Category'}
     )
-    fig3.write_html('data/visualizations/choropleth_map.html')
-    fig3.show()
 
+    # Update the layout for the map
+    fig3.update_layout(
+        title_text='Choropleth Map of Credit Card Fraud per Capita by State',
+        geo=dict(
+            lakecolor='rgb(255, 255, 255)',
+        )
+    )
+
+    # Save the map as an HTML file
+    os.makedirs('data/visualizations', exist_ok=True)
+    fig3.write_html('data/visualizations/choropleth_map.html')
+
+    # Show the map
+    fig3.show()
