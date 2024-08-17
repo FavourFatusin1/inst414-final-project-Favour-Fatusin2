@@ -1,0 +1,6 @@
+Name,Data Types,Example,Units,Description,Example
+State,Text,Maryland,StateName,Name of the state,
+Credit Card Fraud Victim Count,Integer,306,USD,Amout of vicitims in each state,
+Credit Card Fraud Victim Loss Amount,Integer,"$2,527,660",USD,Amount the victims in the state loss all together,
+Credit Card Fraud per Victim,Integer,"$8,260",USD,Amount loss per victim in each state,
+Credit Card Fraud per Capita,Integer,$0.41,USD,rate of credit card fraud incidents per person in a given area,
