@@ -16,8 +16,11 @@ df1 = pd.read_csv(file_path1)
 print("Columns in df1:")
 print(df1.columns)
 
-# Example Data Preparation
-# Replace 'feature' and 'target' with actual column names
+# Data Preparation
+# Remove percentage signs and convert to numeric
+df1['Percentage of age\'s total identity theft reports, 2022'] = df1['Percentage of age\'s total identity theft reports, 2022'].str.rstrip('%').astype('float') / 100.0
+
+# Define features and target
 X = df1[['Number of reports, 2024 Q1-Q2']]  # Features
 y = df1['Percentage of age\'s total identity theft reports, 2022']  # Target
 
