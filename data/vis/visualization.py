@@ -8,7 +8,7 @@ import os
 os.makedirs('data/visualizations', exist_ok=True)
 
 # Load the transformed data
-file_path1 = 'data/outputs/transformed_loaded_firstchart.csv'
+file_path1 = 'data/outputs/transformed_firstchart.csv'
 file_path2 = 'data/outputs/transformed_secondchart.csv'
 
 df1 = pd.read_csv(file_path1)
