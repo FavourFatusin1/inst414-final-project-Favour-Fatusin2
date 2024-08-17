@@ -4,43 +4,39 @@ from sklearn.metrics import mean_squared_error, r2_score
 import os
 
 # Ensure the 'models' directory exists
-os.makedirs('data/models', exist_ok=True)
+def create_models_directory():
+    os.makedirs('data/models', exist_ok=True)
 
 # Load the processed data
-file_path1 = 'data/processed/loaded_firstchart.csv'
-df1 = pd.read_csv(file_path1)
+def load_data(file_path):
+    return pd.read_csv(file_path)
 
-# Print column names to verify
-print("Columns in df1:")
-print(df1.columns)
-
-# Convert target variable to numeric
-df1['Percentage of age\'s total identity theft reports, 2022'] = df1['Percentage of age\'s total identity theft reports, 2022'].str.rstrip('%').astype(float) / 100.0
-
-# Select features and target
-X = df1[['Number of reports, 2024 Q1-Q2']]  # Feature(s)
-y = df1['Percentage of age\'s total identity theft reports, 2022']  # Target
+# Prepare the data by converting the target variable to numeric
+def prepare_data(df):
+    df['percentage_of_age\'s_total_identity_theft_reports,_2022'] = df['percentage_of_age\'s_total_identity_theft_reports,_2022'].str.rstrip('%').astype(float) / 100.0
+    X = df[['number_of_reports,_2024_q1-q2']]  # Feature(s)
+    y = df['percentage_of_age\'s_total_identity_theft_reports,_2022']  # Target
+    return X, y
 
 # Load the saved model
-model_path = 'data/models/linear_regression_model.pkl'
-model = joblib.load(model_path)
+def load_model(model_path):
+    return joblib.load(model_path)
 
 # Make predictions using the loaded model
-y_pred = model.predict(X)
+def make_predictions(model, X):
+    return model.predict(X)
 
-# Evaluate the model
-mse = mean_squared_error(y, y_pred)
-r2 = r2_score(y, y_pred)
+# Evaluate the model's performance
+def evaluate_model(y, y_pred):
+    mse = mean_squared_error(y, y_pred)
+    r2 = r2_score(y, y_pred)
+    return mse, r2
 
-# Output the performance metrics
-print(f"Mean Squared Error: {mse}")
-print(f"R^2 Score: {r2}")
-
-# Save predictions
-predictions_df = pd.DataFrame({
-    'Actual': y,
-    'Predicted': y_pred
-})
-predictions_path = 'data/models/evaluated_predictions.csv'
-predictions_df.to_csv(predictions_path, index=False)
-print(f"Evaluated predictions saved to {predictions_path}")
+# Save predictions to a CSV file
+def save_predictions(y, y_pred, predictions_path):
+    predictions_df = pd.DataFrame({
+        'Actual': y,
+        'Predicted': y_pred
+    })
+    predictions_df.to_csv(predictions_path, index=False)
+    print(f"Evaluated predictions saved to {predictions_path}")
